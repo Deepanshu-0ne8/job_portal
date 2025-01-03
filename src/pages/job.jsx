@@ -1,8 +1,9 @@
-import { getSingleJob } from '@/api/apijobs';
+import { getSingleJob, updateHiringStatus } from '@/api/apijobs';
 import useFetch from '@/hooks/use-fetch';
 import { useUser } from '@clerk/clerk-react'
 import MDEditor from '@uiw/react-md-editor';
 import { Briefcase, DoorClosed, DoorOpen, MapPinIcon } from 'lucide-react';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import React, { useEffect } from 'react'
 import { useParams } from 'react-router-dom';
 import { BarLoader } from 'react-spinners';
@@ -20,6 +21,18 @@ const JobPage
    }=useFetch(getSingleJob,{
     job_id:id,
    });
+
+   const {
+    loading:loadingHiringStatus,
+    fn:fnHiringStatus,
+   }=useFetch(updateHiringStatus,{
+    job_id:id,
+   });
+
+   const handleStatusChange =(value)=>{
+    const isOpen = value ==="open"
+    fnHiringStatus(isOpen).then(() => fnJob())
+  };
 
    useEffect(() => {
     if (isLoaded) fnJob();
@@ -58,6 +71,23 @@ const JobPage
       </div>
 
       {/* hiring status */}
+      {loadingHiringStatus && <BarLoader width={"100%"} color='#36d7b7' />}
+      {Job?.recruiter_id === user?.id && (
+      <Select onValueChange={handleStatusChange}>
+      <SelectTrigger
+      className={`w-full ${Job?.isOpen ? "bg-green-950" : "bg-red-950"}`}
+      >
+        <SelectValue 
+        placeholder={
+          "Hiring Status" + (Job?.isOpen ? "( Open )" : "( Closed )")
+        } />
+      </SelectTrigger>
+      <SelectContent>
+        <SelectItem value="open">Open</SelectItem>
+        <SelectItem value="closed">Closed</SelectItem>
+      </SelectContent>
+    </Select>
+    )}
 
       <h2 className='text-2xl sm:text-3xl font-bold'>About the job</h2>
       <p className='sm:text-lg' >{Job?.description}</p>
@@ -65,6 +95,8 @@ const JobPage
         What We are looking for
       </h2>
       <MDEditor.Markdown source={Job?.requirements} className='bg-transparent sm:text-lg'/>
+
+      {/* render applications */}
     </div>
   )
 }
