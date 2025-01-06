@@ -7,6 +7,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import React, { useEffect } from 'react'
 import { useParams } from 'react-router-dom';
 import { BarLoader } from 'react-spinners';
+import ApplyJobDrawer from '@/components/apply-job';
+import ApplicationCard from '@/components/application-card';
 
 const JobPage
  = () => {
@@ -97,6 +99,26 @@ const JobPage
       <MDEditor.Markdown source={Job?.requirements} className='bg-transparent sm:text-lg'/>
 
       {/* render applications */}
+      {Job?.recruiter_id !== user?.id && (
+        <ApplyJobDrawer
+          job={Job}
+          user={user}
+          ferchJob={fnJob}
+          applied={Job?.applications?.find((ap) => ap.candidate_id === user.id)}
+        />
+      )}
+
+       {Job?.applications?.length > 0 && Job?.recruiter_id === user?.id && (
+          <div className='flex flex-col gap-2'>
+            <h2 className='text-2xl sm:text-3xl font-bold'>Applications</h2>
+            {Job?.applications.map((application)=>{
+              return (
+              <ApplicationCard key={application.id} application={application}/>
+            );
+            })}
+          </div>
+       )}
+
     </div>
   )
 }
