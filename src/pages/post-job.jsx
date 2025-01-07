@@ -1,5 +1,6 @@
 import { getCompanies } from "@/api/apiCompannies";
 import { addNewJob } from "@/api/apijobs";
+import AddCompanydrawer from "@/components/ui/add-company-drawer";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -155,9 +156,11 @@ const PostJob = () => {
             </SelectGroup>
           </SelectContent>
         </Select>
-    )}
+    )} 
     />
-        {/* Add Company drawer */}
+
+      <AddCompanydrawer fetchCompanies={fnCompanies} />
+
         </div>
         {errors.location && (
       <p className="text-red-500">{errors.location.message}</p>
